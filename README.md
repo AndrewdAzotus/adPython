@@ -1,7 +1,7 @@
 # ProcessParms
 Written in Python, my own take on processing sys.args
 
-First, a couple useful functions at the top:
+First, a few useful functions at the top:
 
 GetValue() takes a string and does its best to return an appropriate value.
 First it checks for a boolean True, False, t, f, plus a few others

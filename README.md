@@ -1,50 +1,59 @@
 # ProcessParms
 A selecction of useful functions Written in Python, that started with my own take on processing sys.argv
 
+Filename:            included functions:
 adCmdOpts.py       - ProcessParms()
 adFilerFns.py      - CopyFile(), MoveFile()
 adFns.py           - GetValue(), is_int(), is_float()
-adRunLock.py       - 
-adText.py          - 
+adRunLock.py       - class RunLock
+adText.py          - JustifyLine(), JustifyText()
 
-First, a few useful functions at the top:
+The following notes apply to the functions above.
 
-GetValue() takes a string and does its best to return an appropriate value.
+**GetValue()** takes a string and does its best to return an appropriate value.
 First it checks for a boolean True, False, t, f, plus a few others
 Secondly, it checks for an integer,
 Third, a float
-if none of these match, then it just returns the string.
+If none of these match, then it just returns the string as passed in.
 
-is_int() and is_float() which were the basis that became GetValue() and simply return True or False depending on the value passed in
+**is_int()** and **is_float()** which were the basis that became GetValue() and simply return True or False depending on the value passed in
 
-ProcessParms(), there are a lot of comments at the top that may end up here,
+**ProcessParms()**, there are a lot of comments at the top that may end up here,
 but basically, you supply a dictionary containing variable names as the keys and details
 of the parms expected and how to process them as values and it returns the same dictionary
 with the dictionary values containing the validated parms from the invoking command line.
 
-On the invoking command, the args are considered to be cmds with an optional argument,
-e.g. python-pgm -n 23 --force
-where the cmds are n and force and the cmd arg is 23. It does break the rules a little as
-python-pgm --n 23 -force is equally valid, any number of hyphens in fact.
+Pass in a dictionary, for example:
+  parms = { }
+  parms["number"] = "n,number:"
+  parms["forcerun"] = "force"
+  parms["dayOfWeek"] = "c,color,colour:[Red,Blue,Green]
+  parms = adCmdOpts.ProcessParms(parms)
 
-The dictionary passed to ProcessParms defines what is expected to be processed on the 
-invoking cmd, e.g. the above could be processed with:
+The minimal usage is shown for forcerun. In this example, parms["forcerun"] is assigned True if specified [--force above] or false [the default] if not. There is no colon in the value, so a boolean type is returned to the calling program.
 
-parms = { }
-parms["number"] = "n,number:"
-parms["forcerun"] = "force"
-parms["dayOfWeek"] = "c,color,colour:[Red,Blue,Green]
+parms["number"] is assigned to the value following -n or -number or an empty string if -n is not used in the command args.
 
-parms["number"] is assigned to the value following -n or -number or an empty string if -n is not used.
-parms["forcerun"] is assigned True if specified [--force above] or false [the default] if not. There is
-  no colon in the value, so a boolean type is returned to the calling program.
-parms["dayOfWeek"] is set if -c, -color or -colour is specified and the arg must be in the list in the
-square brackets, i.e. Red, Blue or Green in this example. If not specified then it defaults to the first
-option
+parms["dayOfWeek"] is set if -c, -color or -colour is specified and the arg must be in the list in the square brackets, i.e. Red, Blue or Green in this example. If not specified then it defaults to the first option
 
-The final part of this is a class called RunLock that can create a file in /run/lock [Linux specific]
-and places the PId as the contents. The implication is that setting this file allows a calling pgm to 
-check if it is already running and to return the pid of that other running instance and allows a clean
-way to quit, note ProcessParms above has the option to set this file too, but does not make use of nor
-returns the object create by this object...
-...but it could :) -- perhaps a later update
+the functionality of --help or -h is automatically built into ProcessParms. The programmer does not need to add --help to the dictionary. Add any text after the dictionary value inside braces, for example:
+  parms["number"] = "n,number:{enter a number}"
+and this will be output when the end user specifies the --help arg, for example pgmname --help:
+
+Help Information for pgmame
+ -n, --number    enter a number
+
+If the program needs an -h option, for example -h for -humanreadable numbers:
+parms["humanreadable"] = "h,humanreadable{output numbers in human readable format}"
+then only --help would display the help text, -h would be returned to the calling program with the parm set accordingly.
+
+Adding dictionary entries of "Help-Intro*" will be output after the Header line and before the parm definitions and "Help-Descr*" would be output after the parms. If any of these entries start with ". " or "o " or "- " then all lines after the first will be indented by 2 spaces, e.g.
+
+parms["help-intro1"] = "- this is a wondeful program that does magic stuff"
+
+- this is a wondeful program that
+  does magic stuff
+
+All text output is word wrapped and justified to fit on the screen depending on the width of the output terminal.
+
+... more documentation to come ...

@@ -1,5 +1,5 @@
 # ProcessParms
-Written in Python, my own take on processing sys.args
+Written in Python, my own take on processing sys.argv
 
 First, a few useful functions at the top:
 

@@ -56,4 +56,12 @@ parms["help-intro1"] = "- this is a wondeful program that does magic stuff"
 
 All text output is word wrapped and justified to fit on the screen depending on the width of the output terminal.
 
+**JustifyLine()** and **JustifyText()** perform very similar functions. JustifyText() calls JustifyLine() for the actual justification. JustifyText takes as its first parm a string of text, this is split into multiple lines of whole words. Each line is then passed to JustifyLine() to for alignment.
+
+Both functions have up to three parms:
+  txt  .. .. .. .. the text to be justified
+  lnWidth .. .. .. the width to justify the text to
+  justify .. .. .. the justification type: left, right, centre or full. Note that justify = "full" is not well balanced but it looks well enough.
+If the text begins with  ". " or "o " or "- " then all lines after the first will be indented by 2 spaces as shown above for --help in ProcessParms
+
 ... more documentation to come ...

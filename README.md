@@ -1,5 +1,11 @@
 # ProcessParms
-Written in Python, my own take on processing sys.argv
+A selecction of useful functions Written in Python, that started with my own take on processing sys.argv
+
+adCmdOpts.py       - ProcessParms()
+adFilerFns.py      - CopyFile(), MoveFile()
+adFns.py           - GetValue(), is_int(), is_float()
+adRunLock.py       - 
+adText.py          - 
 
 First, a few useful functions at the top:
 
@@ -9,9 +15,9 @@ Secondly, it checks for an integer,
 Third, a float
 if none of these match, then it just returns the string.
 
-then, is_int() and is_float() which were the basis that became GetValue()
+is_int() and is_float() which were the basis that became GetValue() and simply return True or False depending on the value passed in
 
-Then there is ProcessParms(), there are a lot of comments at the top that may end up here,
+ProcessParms(), there are a lot of comments at the top that may end up here,
 but basically, you supply a dictionary containing variable names as the keys and details
 of the parms expected and how to process them as values and it returns the same dictionary
 with the dictionary values containing the validated parms from the invoking command line.
@@ -24,7 +30,7 @@ python-pgm --n 23 -force is equally valid, any number of hyphens in fact.
 The dictionary passed to ProcessParms defines what is expected to be processed on the 
 invoking cmd, e.g. the above could be processed with:
 
-parms = {}
+parms = { }
 parms["number"] = "n,number:"
 parms["forcerun"] = "force"
 parms["dayOfWeek"] = "c,color,colour:[Red,Blue,Green]

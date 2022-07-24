@@ -7,7 +7,29 @@ sys.path.append("/mnt/ref/Python")
 import adFns
 import adText
 
-debugging = not True   #: turn on/off internal debugging msgs
+debugging = not True #: turn on/off internal debugging msgs
+
+# #########################################################
+#
+#   ###
+#  #   #
+#  #   #
+#  #####
+#  #   #
+#  #   #
+#  #   #  #
+#
+# #########################################################
+#
+#   ###          #
+#  #   #         #
+#  #   # ###     # ###   ##
+#  ##### #  #  ### #  # #  #
+#  #   # #  # #  # #    ###
+#  #   # #  # #  # #    #
+#  #   # #  #  ### #     ##
+#
+# #########################################################
 
 def IsHelp(s, helpType = ""):
   return (s[0:4+len(helpType)].lower() == "help" + helpType)
@@ -43,6 +65,8 @@ def DisplayHelp(pgmName, parms):
       parmDflt = ""
       parmOpts = ""
       parmHelp = ""
+      if (parms[parm][-1] != "}") and not IsHelp(parm):
+        parms[parm] += "{No Help Information Available}"
       if (parms[parm][-1] == "}"):
         ptr = parms[parm].find(":")
         if (ptr < 0):
@@ -57,9 +81,9 @@ def DisplayHelp(pgmName, parms):
           else:
             parmDflt = parmDflt[1:-2]
         if parmDflt != "":
-          parmHelp += ", default = {}".format(parmDflt)
+          parmHelp += ", default value = {}".format(parmDflt)
         if parmOpts != "":
-          parmHelp += ", possible options are one of {}".format(parmOpts.replace(",", ", "))
+          parmHelp += "; possible options are one of {}".format(parmOpts.replace(",", ", "))
 
         if parmCmds == "":
           lastHelp = parmHelp
@@ -74,7 +98,9 @@ def DisplayHelp(pgmName, parms):
               else:
                 cmdList += "--{0}".format(parmCmd)
         listCmds.append( [cmdList, parmHelp] )
-        maxCmdLen = max(maxCmdLen, len(cmdList))
+#        if (parm.lower()[0:4] != "help"):
+        if (not IsHelp(parm)):
+          maxCmdLen = max(maxCmdLen, len(cmdList))
   if lastHelp != "":
     listCmds.append( ["\nAny Remaining arguments:", lastHelp] )
   for cmd in listCmds:
@@ -88,7 +114,7 @@ def DisplayHelp(pgmName, parms):
       ptr = parmHelp.find(" ", 1)
       if (len(opLn) + (ptr if ptr >= 0 else len(parmHelp)) > termSize.columns - 2):
         print (opLn)
-        opLn = " " * min(maxCmdLen, 17) + " "
+        opLn = " " * min(maxCmdLen, int(termSize.columns / 2)) + " "
       else:
         opLn += parmHelp[0:ptr] if ptr > 0 else parmHelp
         parmHelp = parmHelp[ptr:] if ptr > 0 else ""
@@ -188,10 +214,10 @@ def ProcessParms(parms, setRunLock = False):
 #
 ## define intial variables:
   rc        = {}         #: where to store the parms bring returned to the caller
-  catchParm = None       
-  catchList = None     
-  adRunLock  = None     
-  useHforHelp = True
+  catchParm  = None     
+  catchList   = None     
+  adRunLock   = None     
+  useHforHelp = True 
 
   for parm in parms:
     if (isinstance(parms[parm], str)):
@@ -237,7 +263,8 @@ def ProcessParms(parms, setRunLock = False):
       parmsCpy.update(parms)
       DisplayHelp(os.path.split(sys.argv[0])[1], parmsCpy)
       sys.exit(0)
-## 
+
+##
     if (debugging):
       print ("a] checking arg: {}".format(arg))
     if (arg[0:1] == "-"):
@@ -248,7 +275,7 @@ def ProcessParms(parms, setRunLock = False):
         cmd = cmd[0 : cmd.find(":")]
       cmd = ",{},".format(cmd)
     if (debugging):
-      print ("a] cmd: {0} .. arg: {1}".format(cmd, arg))
+      print ("b] cmd: {0} .. arg: {1}".format(cmd, arg))
 
     ## strip off any help information
     for parm in parms:
@@ -302,6 +329,7 @@ def ProcessParms(parms, setRunLock = False):
     if (cmd == None and arg != None):
       if (debugging):
         print ("cmd+arg", cmd, arg)
+        print ("catch parm, list", catchParm, catchList)
       if (catchParm != None):
         if (catchList != None and parms[catchParm] != ""):
           parms[catchList].append(parms[catchParm])
@@ -311,6 +339,9 @@ def ProcessParms(parms, setRunLock = False):
           print ("Assigning catchparm to", arg)
         parms[catchParm] = arg
         arg = None
+      else:
+        if (catchList != None):
+          parms[catchList].append(arg)
 
 # remove all of the already processed parms
   for parm in rc:

@@ -6,20 +6,30 @@ import os
 #import adFns
 
 debugging = not True   #: turn on/off internal debugging msgs
+############################################################################################################
 
-def JustifyLine(txt, lnWidth, justify = "left"):
+## returns the max idx of any of the characters in findChrs in the string in inText
+def GetLastIdx(findChrs, inText, startPosn = 0, endPosn = None):
+  if endPosn == None:
+    endPosn = len(inText)
+  idx = -1
+  for chr in findChrs:
+    idx = max(idx, inText.rfind(chr, startPosn, endPosn))
+  return idx
+
+def JustifyLine(txt, lnWidth = os.get_terminal_size().columns, justify = "left"):
   justify = justify[0].lower()
-  if justify == "l":
-    return txt # default, do nowt, here is it is [probably] most likely to pass the rest of the choices for performance reasons
+  numWords = txt.count(" ")
+  if numWords == 0 or justify == "l":
+    return txt # default, do nowt, left is [probably] most likely, so pass the rest of the choices for performance reasons
 
   if justify == "r":
     return (" " * (lnWidth - len(txt))) + txt
 
-  elif justify == "c":
+  if justify == "c":
     return " " * int((lnWidth - len(txt)) / 2) + txt
 
-  elif justify == "f":
-    numWords = txt.count(" ")
+  if justify == "f":
     if numWords > 0:
       numSpcs = int((lnWidth - len(txt)) / numWords) + 1
       opLn = txt.replace(" ", " " * numSpcs)
@@ -35,27 +45,27 @@ def JustifyLine(txt, lnWidth, justify = "left"):
       return opLn
   return txt
 
-def JustifyText(txt, lnWidth = os.get_terminal_size().columns, justify = "left"):
+def JustifyText(txt, lnWidth = os.get_terminal_size().columns, justify = "left", wordDelimiter = "", indentLn = None):
   origLn = txt
-  indentLn = 0
-  if origLn[0] in "-.o" and origLn[1] == " ":
-    indentLn = 2
   justify = justify[0].lower()
+  wordDelimiter = " {}".format(wordDelimiter)
+  if indentLn == None:
+    indentLn = 0
+    if origLn[0] in "-.o" and origLn[1] == " ":
+      indentLn = 2
   if debugging:
     print (("....:....|" * (int(lnWidth / 10) + 1))[0:lnWidth])
   rc = []
   opLn = ""
-  numWords = 0
-  ptr = origLn.find(" ")
+  ptr = GetLastIdx(wordDelimiter, origLn, endPosn = lnWidth)
   while origLn != "":
-    if len(opLn) + (ptr if ptr > 0 else len(origLn)) > lnWidth:
+    if (len(opLn) + (ptr if ptr > 0 else len(origLn)) > lnWidth):
+      startIdx = 1 if origLn[0] == " " else 0
       rc.append(JustifyLine(opLn, lnWidth, justify))
-      opLn = (" " * indentLn) + origLn[1:ptr] if ptr > 0 else origLn[1:]
-      numWords = 1
+      opLn = (" " * indentLn) + (origLn[startIdx:ptr] if ptr > 0 else origLn[startIdx:])
     else:
       opLn += origLn[0:ptr] if ptr >= 0 else origLn
-      numWords += 1
     origLn = origLn[ptr:] if ptr > 0 else ""
-    ptr = origLn.find(" ", 1)
+    ptr = GetLastIdx(wordDelimiter, origLn, 1, lnWidth)
   rc.append(opLn if justify == "f" and ((len(opLn) - opLn.count(" ")) < (lnWidth / 2)) else JustifyLine(opLn, lnWidth, justify))
   return rc

@@ -5,43 +5,38 @@ import time
 
 sys.path.append("/mnt/ref/Python")
 import adFns
+from adText import print_justified
 import adText
 
 debugging = not True #: turn on/off internal debugging msgs
 
 ## This allows this file to dsiplay help, but only if executed directly:
 if os.path.basename(__file__) in sys.argv[0]:
-  print ("adCmdOpts.py Help Information")
-  print ("-----------------------------")
+  print_justified("_adCmdOpts.py Help Information_")
   print ()
-  print ("_IsHelp(text, suffix)_")
-  helpText = "Returns True if text starts with 'help' or if text starts with 'help'+suffix, False otherwise. This is case insensitive and is primarily used to differentiate between parm args and help information in ProcessParms() and DisplayHelp()."
-  for ln in adText.JustifyText(helpText):
-    print (ln)
+  print_justified("_IsHelp(text, suffix)_")
+  print_justified("Returns True if text starts with 'help' or if text starts with 'help'+suffix, False otherwise. This is case insensitive and is primarily used to differentiate between parm args and help information in ProcessParms() and DisplayHelp().")
   print ()
-  print (adText.JustifyText("_DisplayHelp()_"))
-  helpText = "Uses the same parms as ProcessParms() plus the program name which is collected automatically from sys.argv[0]. The argument options are extracted from the parms as is the help text and any default values. These are formatted and output to the user using adText.JustifyText to automatically fit the screen width."
-  for ln in adText.JustifyText(helpText):
-    print (ln)
+  print_justified("_DisplayHelp()_")
+  print_justified("Uses the same parms as ProcessParms() plus the program name which is collected automatically from sys.argv[0]. The argument options are extracted from the parms as is the help text and any default values. These are formatted and output to the user using adText.JustifyText to automatically fit the screen width.")
   print ()
-  print ("_ProcessParms()_")
+  print_justified ("_ProcessParms()_")
   helpInfo = [ ]
   helpInfo.append("ProcessParms takes in a dictionary of parameters to be processed against sys.argv")
-  helpInfo.append("The Dictionary take the form string1, string2 where string 1 is the name of the parm, equivalent to the variable name and string2 defines how a matching sys.argv is to be processed.")
+  helpInfo.append("The Dictionary takes the form string1, string2 where string 1 is the name of the parm which is equivalent to the variable name in the calling program and string2 defines how a matching sys.argv item is to be parsed. Upon return to the calling program, string2 becomes either to value after the arg or the default as specified by the calling program. Note, also, that string2 will change type and become an int, a float, a boolean or remain a string as appropriate.")
   helpInfo.append("Example  1: parms['verbose'] = 'v'")
   helpInfo.append("This example represents a True/False response. In this case, ProcessParms will look for -v in any element in sys.argv and if one is found then parms['verbose'] will be set to True upon return. If -v is not found parms['verbose'] is set to False.")
   helpInfo.append("Example  2: parms['verbose'] = 'v,verbose'")
   helpInfo.append("This also returns a True/False response. In this case, ProcessParms will look for either -v or --verbose in any element in sys.argv and if either is found then parms['verbose'] will be set to True upon return. If neither are found parms['verbose'] is set to False.")
   helpInfo.append("Example  3: parms['colour'] = 'c,color,colour:1'")
-  helpInfo.append("This example is expecting a parameter, as represented by the ':'. In this case, ProcessParms will look for either -c or --color or --colour in any element in sys.argv and if any are found then parms['colour'] will be set to the value following the argument, or None if no value is specified. If none of the three arguments are specified then parms['colour'] is set to the value following the ':', in this example 1, although the value suplied need not be an integer or even a number; there is nothing to stop the user using '--colour red'. This will need to be validated in the calling program")
+  helpInfo.append("This example is expecting a parameter, as represented by the ':'. In this case, ProcessParms will look for either -c or --color or --colour in any element in sys.argv and if any are found then parms['colour'] will be set to the value following the argument, or None if no value is specified. If none of the three arguments are specified then parms['colour'] is set to the value following the ':', in this example 1, although the value supplied need not be an integer or even a number; there is nothing to stop the user using '--colour red'. This will need to be validated in the calling program.")
   helpInfo.append("Example  4: parms['colour'] = 'c,color,colour:[Red,Green,Blue]'")
-  helpInfo.append("This example is expecting a parameter, as represented by the ':'. In this case, a value is expected after the argument and the value must be one of the values in the list, in this case Red, Green or Blue. If the argument is not specified then the first item in the list is the default value")
-  helpInfo.append("In all cases, additional text may be added at the end of the parm value in braces { and }. this is help information and is output when cmd --help is called by the end user. It is automatically ghenerated and parms['help'] = 'help' does not need to be specified or checked for in the calling program")
+  helpInfo.append("This example is expecting a parameter, as represented by the ':'. In this case, a value is expected after the argument and the value must be one of the values in the list, in this case either Red, Green or Blue. If the argument is not specified then the first item in the list is the default value.")
+  helpInfo.append("In all cases, additional text may be added at the end of the parm value in braces { and }. this is help information and is output when cmd --help is called by the end user. It is automatically generated and parms['help'] = 'help' does not need to be specified or checked for in the calling program")
   helpInfo.append("_Known issues and potential improvements_")
   helpInfo.append("- allow the calling program to specify it a particular value type, e.g. int or float")
   helpInfo.append("- warn with raised error if arguments are specified more than once, i.e. not unique")
   helpInfo.append("- JustifyText gets confused when '\\n' is included in text")
-#  helpInfo.append("")
   for helpText in helpInfo:
     for ln in adText.JustifyText(helpText):
       print (ln)
@@ -51,15 +46,15 @@ if os.path.basename(__file__) in sys.argv[0]:
 
 # #########################################################
 #
-#   AAA   N   N  DDDD   RRRR   EEEEE  W   W    DD
-#  A   A  N   N  D   D  R   R  E      W   W    D 
-#  A   A  NN  N  D   D  R   R  E      W   W    D 
-#  AAAAA  N N N  D   D  RRRR   EEE    W   W    D 
-#  A   A  N  NN  D   D  R R    E      W W W    D 
-#  A   A  N   N  D   D  R  R   E      W W W    D 
-#  A   A  N   N  DDDD   R   R  EEEEE   WWW     DD
+#   AAA   N   N  DDDD   RRRR   EEEEE  W   W    DDDD
+#  A   A  N   N  D   D  R   R  E      W   W    D   
+#  A   A  NN  N  D   D  R   R  E      W   W    D   
+#  AAAAA  N N N  D   D  RRRR   EEE    W   W    D  
+#  A   A  N  NN  D   D  R R    E      W W W    D  
+#  A   A  N   N  D   D  R  R   E      W W W    D  
+#  A   A  N   N  DDDD   R   R  EEEEE   WWW     DDD
 #
-# #############################################################
+# ##############################################################
 #
 #   AAA          d                   DDDD
 #  A   A         d                   D   D               i
@@ -69,7 +64,7 @@ if os.path.basename(__file__) in sys.argv[0]:
 #  A   A n  n d  d r    e    w w w   D   D a  a    v v   i     s
 #  A   A n  n  ddd r     ee   w w    DDDD   aa a    v     i  ss
 #
-# #############################################################
+# ###############################################################
 
 def IsHelp(s, helpType = ""):
   return (s[0:4+len(helpType)].lower() == "help" + helpType)
@@ -242,16 +237,14 @@ def ProcessParms(parms, setRunLock = False):
 #     if there is an empty string in the incoming value then it is filled with the last arg not following a command
 #     all preceeding args not related to a command arg are placed in a supplied list [see catchall above]
 #
-# Improvements:
-# - be able to call as ProcessParms(parms, <True|False>) without the assignment
-#
 ## define intial variables:
   rc          = {}       #: where to store the parms bring returned to the caller
-  catchParm   = None     
-  catchList   = None     
-  adRunLock   = None     
-  useHforHelp = True 
+  catchParm   = None     #
+  catchList   = None     #
+  adRunLock   = None     #
+  useHforHelp = True     #
 
+## prepare caller's parms for processing:
   for parm in parms:
     if (isinstance(parms[parm], str)):
       if (parms[parm] == '' or parms[parm][0:1] == "{"):
@@ -277,6 +270,24 @@ def ProcessParms(parms, setRunLock = False):
     for arg in sys.argv:
       print ("arg: {0}".format(arg))
     print ()
+
+## has user asked for help:
+  if "--help" in sys.argv or (useHforHelp and "-h" in sys.argv):
+    helpText = "," + ("h," if useHforHelp else "") + "help,{Displey this information}"
+    parmsCpy = { "helptext": helpText }
+    parmsCpy.update(parms)
+    DisplayHelp(os.path.split(sys.argv[0])[1], parmsCpy)
+    sys.exit(0)
+  else:
+## strip off any help information
+    for parm in parms:
+      if len(parms[parm]) > 0 and parms[parm][-1] == "}":
+        ptr = parms[parm].find("{")
+        parms[parm] = parms[parm][0:ptr]
+        if debugging:
+          print (".>>", parm, parms[parm])
+
+## start looping through args
   for arg in sys.argv:
     if (arg == sys.argv[0]):
       if (setRunLock):
@@ -285,22 +296,9 @@ def ProcessParms(parms, setRunLock = False):
       continue
 ##??    cmd = arg.lower()
 
-## process help - send to other def?
-    helpCmds = []
-    if useHforHelp:
-      helpCmds.append("-h")
-    helpCmds.append("--help")
-    if (arg in helpCmds):
-      helpText = "," + ("h," if useHforHelp else "") + "help,{Displey this information}"
-      parmsCpy = { "helptext": helpText }
-      parmsCpy.update(parms)
-      DisplayHelp(os.path.split(sys.argv[0])[1], parmsCpy)
-      sys.exit(0)
-
-###
+####
     if (debugging):
       print ("a] checking arg: {}".format(arg))
-    print (">>>", arg)
     if (arg[0:2] == "--"):
       cmd = arg[2:]
       arg = None
@@ -319,7 +317,6 @@ def ProcessParms(parms, setRunLock = False):
         if arg[0] in ":=":
           # arg = adFns.GetValue(arg[1:])
           arg = arg[1:]
-        print ("..>", cmd, arg)
       else:
         arg = None
       if (cmd.find(":") > 0):
@@ -332,17 +329,7 @@ def ProcessParms(parms, setRunLock = False):
     if (debugging):
       print ("b] cmd: {0} .. arg: {1}".format(cmd, arg))
 
-# causes more problems than it solves, commented out
-#  if True: # because otherwise, I shall have to de-indent all the below lines by hand
-    ## strip off any help information
-    for parm in parms:
-      if len(parms[parm]) > 0 and parms[parm][-1] == "}":
-        ptr = parms[parm].find("{")
-        parms[parm] = parms[parm][0:ptr]
-        if debugging:
-          print (".>>", parm, parms[parm])
-
-    ## loop through parms, looking for the matching one
+### loop through parms, looking for the matching one
     for parm in parms:
       if (isinstance(cmd, str)):
         if debugging:
@@ -419,7 +406,12 @@ def ProcessParms(parms, setRunLock = False):
     parms.pop(catchList)
 
 # copy any remaining unspecified parms to parms being returned
+  if debugging:
+    print("parms>", parms)
+    print("rc ..>", rc)
   for parm in parms:
+    if debugging:
+      print (parm, parms[parm])
     if (parm[0:4].lower() == "help"):
       pass
     elif (isinstance(parms[parm], str) and parms[parm].find(',:[') > 0 and parms[parm][-1] == "]"):

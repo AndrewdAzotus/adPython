@@ -332,7 +332,8 @@ def ProcessParms(parms, setRunLock = False):
     if (debugging):
       print ("b] cmd: {0} .. arg: {1}".format(cmd, arg))
 
-  if True: # because otherwise, I shall have to de-indent all the below lines by hand
+# causes more problems than it solves, commented out
+#  if True: # because otherwise, I shall have to de-indent all the below lines by hand
     ## strip off any help information
     for parm in parms:
       if len(parms[parm]) > 0 and parms[parm][-1] == "}":

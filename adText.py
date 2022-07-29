@@ -87,7 +87,7 @@ def JustifyText(txt, lnWidth = None, justify = "left", wordDelimiter = "", inden
       for chr in wordDelimiter:
         ptr = max(ptr, opLn.rfind(chr, 0, lnWidth))
       opLn = opLn[0:ptr]
-      origLn = origLn[(len(opLn) + 1 - indentSz):]
+      origLn = origLn[(len(opLn) + startIdx - indentSz):]
     else:
       origLn = ""
     rc.append(JustifyLine(opLn, lnWidth, justify))
@@ -131,10 +131,11 @@ if os.path.basename(__file__) in sys.argv[0]:
   print_justified ("o indentLn = None - indent 2nd line onward by an indentation. If this is a number then indent lines by n spaces. If this is some text then indent line by that text e.g. '... ' to start lines 2 onward with ... ")
   print_justified ('')
   print_justified ("Improvements:")
-  print_justified ("- allow pass through of parms in print():")
+  print_justified ("- allow pass through of the following parms in print():")
   print_justified (". sep='separator' - Optional. Specify how to separate the objects, if there is more than one. Default is ' '", indentLn=20)
   print_justified (". end='end'       - Optional. Specify what to print at the end. Default is '\\n' (line feed)", indentLn=20)
   print_justified (". file            - Optional. An object with a write method. Default is sys.stdout", indentLn=20)
   print_justified (". flush           - Optional. A Boolean, specifying if the output is flushed (True) or buffered (False). Default is False", indentLn=20)
-  print_justified ("{} things make up some stuff as {:2.2%} percentage... into multiple lines based on lnWidth then calls JustifyLine() to justify each line and returns a list of justified lines of text. Takes text and breaks it down into multiple lines based on lnWidth then calls JustifyLine() to justify each line and returns a list of justified lines of text. Takes text and breaks it down into multiple lines based on lnWidth then calls JustifyLine() to justify each line and returns a list of justified lines of text".format(11, 23 / 137))
+  print_justified ('')
+  print_justified ("Test output line for print_justified: {} things make up stuff as {:2.2%} percentage... on lnWidth then calls JustifyLine() to justify each line and returns a list of justified lines of text. Takes text and breaks it down into multiple lines based on lnWidth then calls JustifyLine() to justify each line and returns a list of justified lines of text. Takes text and breaks it down into multiple lines based on lnWidth then calls JustifyLine() to justify each line and returns a list of justified lines of text".format(11, 23 / 137))
   print_justified ("")

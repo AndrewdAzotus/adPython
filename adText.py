@@ -3,9 +3,19 @@ import os
 import sys
 import time
 
-######################################################################################
+# ####################################################################################
+#
+#  AAA          d  
+# A   A         d  
+# A   A         d       ee             d '  A
+# AAAAA nnn   ddd  rrr e  e w   w    ddd
+# A   A n  n d  d r    eeee w   w   d  d
+# A   A n  n d  d r    e    w w w   d  d
+# A   A n  n  ddd r     ee   w w     ddd
+#
+# ####################################################################################
 debugging = not True #: turn on/off internal debugging msgs
-version = "2.03.011" #: JustifyText now allows a string to indent following lines by
+version = "2.03.013" #: JustifyText now allows a string to indent following lines by
 ######################################################################################
 ## This allows this file to display help, but only if executed directly:
 ## moved to end of file so the help text information can use itself...
@@ -80,7 +90,7 @@ def JustifyText(txt, lnWidth = None, justify = "left", wordDelimiter = "", inden
   underlng = False
   while origLn != "":
     indentSz = len(indentPfx)
-    startIdx = 1 if origLn[0] == " " else 0
+    startIdx = 1 if (origLn[0] == " " and origLn != txt[0:len(origLn)]) else 0
     opLn = (indentPfx + origLn[startIdx:])
     if len(opLn) > lnWidth:
       ptr = -1

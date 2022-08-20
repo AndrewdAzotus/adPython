@@ -324,7 +324,6 @@ def ProcessParms(parms, setRunLock = False):
         adRunLock = adRunLock.RunLock()
         adRunLock.set()
       continue
-##??    cmd = arg.lower()
 
 ## Splitup the cmd args with ,s and separate out the arg value
     if (debugging):
@@ -360,11 +359,13 @@ def ProcessParms(parms, setRunLock = False):
       print ("b] cmd: {0} .. arg: {1}".format(cmd, arg))
 
 ### loop through parms, looking for the matching one
+    foundParm = None
     for parm in parms:
       if (isinstance(cmd, str)):
         if debugging:
           print ("cmd is string", cmd)
         if (isinstance(parms[parm], str) and cmd in parms[parm]):
+          foundParm = parm
           if debugging:
             print("parms[parm]", parms[parm])
 
@@ -374,7 +375,6 @@ def ProcessParms(parms, setRunLock = False):
               print ("Setting {} to True".format(parm))
             rc[parm] = True
             cmd = None
-
           else:
             ## assign a parm with a value
             if arg == None: ## not ready yet
@@ -400,6 +400,9 @@ def ProcessParms(parms, setRunLock = False):
               rc[parm] = None if arg == None else adFns.GetValue(arg)
             cmd = None
           arg = None
+#    print (">>>", foundParm, parms)
+    if foundParm == arg == None:					# 1.03.008
+      print ("Unknown Cmd Arg: {}".format(cmd[1:-1]))			# 1.03.008
 
 # fill unassigned parm to catch alls
     if (cmd == None and arg != None):
@@ -418,8 +421,6 @@ def ProcessParms(parms, setRunLock = False):
       else:
         if (catchList != None):
           parms[catchList].append(arg)
-  if cmd != None:								# 1.03.008
-    print ("Specified Cmd arg {} not found".format(cmd[1:-1]))			# 1.03.008
 
 # remove all of the already processed parms
   for parm in rc:

@@ -1,13 +1,12 @@
 #!/usr/bin/python3
-import os, sys
-import time
+import os, sys, time
 # ########################################################################## #
 #
 #   AAA          d                      d ''  AAA             t              #
 #  A   A         d                      d  ' A   A           ttt             #
 #  A   A         d       ee             d '  A   A            t         ss   #
-#  AAAAA nnn   ddd r rr e  e w   w    ddd    AAAAA zzzz  oo   t   u  u s     #
-#  A   A n  n d  d rr   eee  w   w   d  d    A   A   z  o  o  t   u  u  ss   #
+#  AAAAA nnn   ddd  rrr e  e w   w    ddd    AAAAA zzzz  oo   t   u  u s     #
+#  A   A n  n d  d r    eee  w   w   d  d    A   A   z  o  o  t   u  u  ss   #
 #  A   A n  n d  d r    e    w w w   d  d    A   A  z   o  o  t   u  u    s  #
 #  A   A n  n  ddd r     ee   w w     ddd    A   A zzzz  oo    tt  uuu  ss   #
 #
@@ -15,8 +14,12 @@ import time
 debugging = not True # turn on/off internal debugging msgs
 version = "1.03.007" # added output msg if end user called calling pgm with an invalid parm
 version = "1.03.008" # moved the output msg, it was in the wrong place.
-# ################## # ########### #
-sys.path.append("/mnt/ref/Python") #
+version = "1.03.009" # tidied up the help text when initialising default parms.
+version = "1.03.011" # checks cmd arg parms and raises an exception if there are duplicates.
+version = "1.03.012" # patched to not check for duplicate cmd args in the catch all.
+# ################## # ############# #
+from adIntFns import AppendToSysPath #
+AppendToSysPath("/mnt/ref/Python") #
 import adFns                       #
 from adText import print_justified #
 # ################################ #
@@ -144,30 +147,35 @@ if os.path.basename(__file__) in sys.argv[0]:
   helpInfo.append("- parms['help-descr<suffix>'] = 'help text'. help-descr paragraphs will be displayed after the help for the parms in the order that the help-descr parms are added to the diectionary.")
 
   helpInfo.append("_Known issues and potential improvements_")
-  helpInfo.append("- if a cmd arg is specified by the caller but is not in the parms list then the end user needs to be notified")
   helpInfo.append("- allow the calling program to specify it a particular value type, e.g. int or float")
-  helpInfo.append("- warn with raised error if arguments are specified more than once, i.e. not unique")
-  helpInfo.append("- JustifyText gets confused when '\\n' is included in text")
   helpInfo.append("- work out a way to allow -v to be specified when -v2 is expected even when there is another arg afterward, perhaps even an argument destined for the catchall. This would allow ignoring the default and having a True/False returned")
   helpInfo.append("- Some[?] programs allow concatenated args, e.g. 'du -hd1' but not 'du -BGd2' needs to be 'du -BG -d2'")
+
+  helpInfo.append("_Fixed Issues and Improvements Made_")
+  helpInfo.append("- 1.03.008 - if a cmd arg is specified by the caller but is not in the parms list then the end user needs to be notified")
+  helpInfo.append("- 1.03.009 - Tidied up help text")
+  helpInfo.append("- 1.03.012 - raises exception if duplicate cmd args are specified by calling program")
+
   for helpText in helpInfo:
     print_justified(helpText)
     if not helpText[0:1] in "- . ":
       print ()
   sys.exit(0)
 
-def InitParms(addDefaults = True):
+def InitParms(addDefaults = True, verbose = 0, timeDelay = 2.3):
   parms = { }
   if addDefaults:
-    parms["verbose"]   = "v,verbose:0{display execution trace messages, 0 = off, 1 = high level, 2 = trace messages, 3 = very detailed}"
-    parms["timeDelay"] = "t,timedelay:0{Length of time delay after verbose msgs}"
+    parms["verbose"]   = "v,verbose:{0}".format(verbose)
+    parms["verbose"]   += "{display execution trace messages, typically 0 = off, 1 = high level, 2 = trace messages, 3 = very detailed}"
+    parms["timeDelay"] = "t,timedelay:{0}".format(timeDelay)
+    parms["timeDelay"] += "{Length of time delay in seconds after verbose messages}"
   return parms
 
 def AddDfltParms(newParms = None):
   if newParms == None:
     newParms = { }
-  newParms["verbose"]   = "v,verbose:0{display execution trace messages, 0 = off, 1 = high level, 2 = trace messages, 3 = very detailed}"
-  newParms["timeDelay"] = "t,timedelay:0{Length of time delay after verbose msgs}"
+  newParms["verbose"]   = "v,verbose:0{display execution trace messages, typically 0 = off, 1 = high level, 2 = trace messages, 3 = very detailed}"
+  newParms["timeDelay"] = "t,timedelay:0{Length of time delay in seconds after verbose msgs}"
   return newParms
 
 def IsHelp(s, helpType = ""):
@@ -252,7 +260,7 @@ def DisplayHelp(pgmName, parms):
       ptr = parmHelp.find(" ", 1)
       if (len(opLn) + (ptr if ptr >= 0 else len(parmHelp)) > termSize.columns - 2):
         print (opLn)
-        opLn = " " * min(maxCmdLen, int(termSize.columns / 2)) + " "
+        opLn = " " * min(maxCmdLen, int(termSize.columns / 3)) + " "
       else:
         opLn += parmHelp[0:ptr] if ptr > 0 else parmHelp
         parmHelp = parmHelp[ptr:] if ptr > 0 else ""
@@ -293,13 +301,11 @@ def ProcessParms(parms, setRunLock = False):
       print ("parm: {} .. value: {}".format(parm, parms[parm]))
   if (debugging):
     print ()
-  pgm = ""
-  cmd = None
-  if (debugging):
     print (sys.argv)
     for arg in sys.argv:
       print ("arg: {0}".format(arg))
     print ()
+  cmd = None
 
 ## has user asked for help:
   if "--help" in sys.argv or (useHforHelp and "-h" in sys.argv):
@@ -316,6 +322,17 @@ def ProcessParms(parms, setRunLock = False):
         parms[parm] = parms[parm][0:ptr]
         if debugging:
           print (".>>", parm, parms[parm])
+
+## check to ensure unique parms
+  uniqueParms = []
+  for parm in parms:
+    if type(parms[parm]) is str:
+      for cmdArg in parms[parm].split(","):
+        if cmdArg != "" and cmdArg[0] != ":":
+          if cmdArg not in uniqueParms:
+            uniqueParms.append(cmdArg)
+          else:
+            raise Exception("CmdOpts found duplicate parm specified: parms['{}'] in {} .. {}".format(cmdArg, parm, parms[parm]))
 
 ## start looping through args
   for arg in sys.argv:

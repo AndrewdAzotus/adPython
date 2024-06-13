@@ -1,5 +1,5 @@
 # additions to Python
-A selecction of useful functions Written in Python, that started with my own take on processing sys.argv
+A selection of useful functions Written in Python, that started with my own take on processing sys.argv
 
 Filename:            included functions:
 adCmdOpts.py       - ProcessParms()
